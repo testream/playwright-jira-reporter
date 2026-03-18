@@ -23,26 +23,30 @@ playwright.config.ts
 
 ## Getting started
 
-### 1. Create a Testream project
+### 1. Install Testream for Jira
+
+Install the **[Testream for Jira](https://marketplace.atlassian.com/apps/3048460704/testream-for-jira)** app from the Atlassian Marketplace into your Jira workspace. This is what surfaces test results, failure artifacts, trends, and dashboards inside Jira.
+
+### 2. Create a Testream project
 
 1. Sign in at [testream.app](https://testream.app) (free plan available).
 2. Create a project and copy your API key.
 
-### 2. Install dependencies
+### 3. Install dependencies
 
 ```bash
 npm install
 npx playwright install chromium
 ```
 
-### 3. Configure your API key
+### 4. Configure your API key
 
 ```bash
 cp .env.example .env
 # then set TESTREAM_API_KEY=<your key> in .env
 ```
 
-### 4. Run the tests
+### 5. Run the tests
 
 ```bash
 npm test
@@ -54,8 +58,8 @@ Results are uploaded to Testream automatically when `TESTREAM_API_KEY` is presen
 
 The reporter is configured in `playwright.config.ts`. Key points:
 
-- `branch`, `commitSha`, and `repositoryUrl` are **auto-resolved** by the reporter from Git — no manual wiring needed.
-- `buildName`, `buildNumber`, and `buildUrl` are read from standard `GITHUB_*` environment variables that GitHub Actions injects automatically.
+- `branch`, `commitSha`, `repositoryUrl`, `buildNumber`, and `buildUrl` are **auto-resolved** by the reporter — no manual wiring needed.
+- `buildName` has no auto default; it is read from `GITHUB_WORKFLOW`, which GitHub Actions injects automatically.
 - Playwright is configured to capture artifacts on failure so Testream can attach them to each result.
 
 ## CI with GitHub Actions
@@ -68,10 +72,17 @@ The workflow at `.github/workflows/playwright.yml` runs all tests on every push 
 |---|---|
 | `TESTREAM_API_KEY` | your Testream API key |
 
-All other metadata (branch, commit SHA, build URL, workflow name, run number) is resolved automatically — nothing else to configure.
+All other metadata (branch, commit SHA, build number, build URL, repository URL) is resolved automatically — nothing else to configure.
 
 ## Viewing results in Jira
 
-After a run completes, open your Testream project and connect it to your Jira workspace. Testream will surface pass/fail trends, flag flaky tests, and let you create Jira issues directly from any failed test with the full failure context pre-filled.
+Once tests are uploaded, open your Testream project and connect it to your Jira workspace. With the **[Testream for Jira](https://marketplace.atlassian.com/apps/3048460704/testream-for-jira)** app installed you get:
+
+- **Dashboard** — pass rates, failure counts, flaky test detection, and execution summaries at a glance
+- **Failure Insights** — inspect failed tests with the full error, stack trace, screenshots, videos, and traces attached
+- **Trends & Analytics** — pass/fail trends, duration patterns, and suite growth over custom date ranges
+- **Test Suite Changes** — see which tests were added or removed between runs
+- **Release Visibility** — link test runs to Jira releases to track quality before shipping
+- **Jira Issues** — create issues directly from any failed test with failure context pre-filled
 
 See the [Testream Playwright reporter docs](https://docs.testream.app/reporters/playwright) for the full list of configuration options.

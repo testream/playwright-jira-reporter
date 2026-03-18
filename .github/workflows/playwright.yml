@@ -1,10 +1,15 @@
-name: Playwright + Testream Reporter
+name: Example Playwright CI Workflow with Testream Reporter for Jira
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
+
+concurrency:
+  group: 'playwright-tests'
+  cancel-in-progress: true
+
 jobs:
   test:
     timeout-minutes: 60
