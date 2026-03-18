@@ -1,4 +1,4 @@
-# Playwright + Testream Reporter
+# Playwright Reporter for Jira Teams using Testream
 
 This repository demonstrates how to integrate [Playwright](https://playwright.dev) with [Testream](https://testream.app) so that test results, failure artifacts are automatically uploaded to your Jira workspace after every CI run.
 
