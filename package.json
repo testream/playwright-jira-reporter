@@ -1,0 +1,39 @@
+{
+  "name": "playwright-jira-reporter",
+  "version": "1.0.0",
+  "description": "SEO-friendly Playwright + Jira reporter example using Testream",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:passing": "playwright test tests/passing.spec.ts",
+    "test:failing": "playwright test tests/failing.spec.ts",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "report:html": "playwright show-report"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/testream/playwright-jira-reporter.git"
+  },
+  "keywords": [
+    "playwright",
+    "jira-reporter",
+    "testream",
+    "ctrf",
+    "ci-cd"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/testream/playwright-jira-reporter/issues"
+  },
+  "homepage": "https://github.com/testream/playwright-jira-reporter#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@testream/playwright-reporter": "^1.0.2",
+    "@types/node": "^25.5.0",
+    "dotenv": "^17.3.1",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,12 @@
+
+# Local env — never commit secrets
+.env
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/ctrf/
+/playwright/.cache/
+/playwright/.auth/
