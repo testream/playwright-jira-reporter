@@ -75,14 +75,3 @@ All other metadata (branch, commit SHA, build URL, workflow name, run number) is
 After a run completes, open your Testream project and connect it to your Jira workspace. Testream will surface pass/fail trends, flag flaky tests, and let you create Jira issues directly from any failed test with the full failure context pre-filled.
 
 See the [Testream Playwright reporter docs](https://docs.testream.app/reporters/playwright) for the full list of configuration options.
-
-## Troubleshooting
-
-**Results are not uploading**  
-Verify `TESTREAM_API_KEY` is set and that `TESTREAM_UPLOAD_ENABLED` is not `false`. In CI, confirm the secret is visible to the workflow job.
-
-**No screenshots after a local run**  
-Screenshots only capture on failure. Run `npm run test:failing` to trigger the intentional failures and generate artifacts.
-
-**A selector stopped matching**  
-The tests run against live website content. If testream.app copy or layout changes, update the expected text in the relevant spec file.
