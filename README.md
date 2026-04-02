@@ -1,88 +1,159 @@
-# Playwright Reporter for Jira Teams using Testream
+# Playwright Jira Reporter: Send Playwright Test Results to Jira with Testream
 
-This repository demonstrates how to integrate [Playwright](https://playwright.dev) with [Testream](https://testream.app) so that test results, failure artifacts are automatically uploaded to your Jira workspace after every CI run.
+This repository is a practical **Playwright + Jira integration example** using [`@testream/playwright-reporter`](https://docs.testream.app/reporters/playwright). It shows how to upload Playwright test results and failure artifacts (screenshots and traces) from local runs and GitHub Actions into Jira via Testream.
+
+If you are searching for **"Playwright Jira reporter"**, **"Playwright GitHub Actions Jira integration"**, or **"send Playwright results to Jira"**, this repo is the implementation template.
+
+## Why this example is useful
+
+- **CI-ready**: Includes a complete GitHub Actions workflow.
+- **Failure artifact capture**: Screenshots are captured on failure and uploaded.
+- **Flexible upload control**: Upload is enabled by `TESTREAM_API_KEY` and can be toggled via `TESTREAM_UPLOAD_ENABLED`.
+- **Practical demo**: Intentional failures show realistic triage in Jira.
 
 ## What is Testream?
 
-[Testream](https://testream.app) is a test reporting tool for Jira teams. It imports CI/CD test results from native reporters (Playwright, Jest, Cypress, and others), giving your team failure inspection, trends, and release visibility directly inside Jira — without manual test case management.
+[Testream](https://testream.app) is an automated test management and reporting platform for Jira teams. It ingests test results from Playwright and other frameworks, then provides failure diagnostics, trends, and release visibility directly in Jira.
 
-Once configured, every Playwright run streams structured results and artifacts to Testream. Failed tests appear in Jira with the full error message, screenshots, and traces attached, so triage starts with complete context.
+If this sample repository is not the framework you need, browse all native reporters in the Testream docs: <https://docs.testream.app/>.
+
+### Watch Testream in action
+
+Click to see how Testream turns raw CI test results into actionable Jira insights (failures, trends, and release visibility):  
+[![Watch the video](https://img.youtube.com/vi/5sDao2Q8k1k/maxresdefault.jpg)](https://www.youtube.com/watch?v=5sDao2Q8k1k)
+
+Install **[Testream Automated Test Management and Reporting for Jira](https://marketplace.atlassian.com/apps/3048460704/testream-automated-test-management-and-reporting-for-jira)** in your Jira workspace to view uploaded runs.
 
 ## Project structure
 
-```
+```text
 tests/
-  passing.spec.ts   — smoke tests against testream.app (expected to pass)
-  failing.spec.ts   — intentionally failing tests that demonstrate artifact capture
+  passing.spec.ts   - Smoke tests expected to pass
+  failing.spec.ts   - Intentional failures to demonstrate artifact capture
 playwright.config.ts
 .github/workflows/playwright.yml
 .env.example
 ```
 
-`failing.spec.ts` is intentionally wrong — it exists so you can see what a failed test looks like inside Testream and Jira, complete with screenshots, video, and trace.
+`failing.spec.ts` is intentionally incorrect to show end-to-end failure diagnostics in Testream/Jira.
 
-## Getting started
+## Quick start: Playwright to Jira reporting
 
-### 1. Install Testream for Jira
+### 1. Create your Testream project and API key
 
-Install the **[Testream for Jira](https://marketplace.atlassian.com/apps/3048460704/testream-for-jira)** app from the Atlassian Marketplace into your Jira workspace. This is what surfaces test results, failure artifacts, trends, and dashboards inside Jira.
+1. Sign in at [testream.app](https://testream.app).
+2. Create a project.
+3. Copy your API key.
 
-### 2. Create a Testream project
-
-1. Sign in at [testream.app](https://testream.app) (free plan available).
-2. Create a project and copy your API key.
-
-### 3. Install dependencies
+### 2. Install dependencies
 
 ```bash
 npm install
 npx playwright install chromium
 ```
 
-### 4. Configure your API key
+### 3. Configure environment variables
 
 ```bash
 cp .env.example .env
-# then set TESTREAM_API_KEY=<your key> in .env
 ```
 
-### 5. Run the tests
+Set at least:
+
+```bash
+TESTREAM_API_KEY=<your key>
+```
+
+### 4. Run Playwright tests
 
 ```bash
 npm test
 ```
 
-Results are uploaded to Testream automatically when `TESTREAM_API_KEY` is present. Without a key, tests still run and produce local HTML reports and CTRF output — no upload occurs.
+With `TESTREAM_API_KEY`, results upload to Testream. Without it, tests still run and local reports are generated.
 
-## Testream reporter configuration
+## Reporter configuration (`playwright.config.ts`)
 
-The reporter is configured in `playwright.config.ts`. Key points:
+Key behavior in this example:
 
-- `branch`, `commitSha`, `repositoryUrl`, `buildNumber`, and `buildUrl` are **auto-resolved** by the reporter — no manual wiring needed.
-- `buildName` has no auto default; it is read from `GITHUB_WORKFLOW`, which GitHub Actions injects automatically.
-- Playwright is configured to capture artifacts on failure so Testream can attach them to each result.
+- Reporter is always declared, but upload is controlled by `uploadEnabled`.
+- `uploadEnabled` requires API key and allows an explicit off switch via `TESTREAM_UPLOAD_ENABLED=false`.
+- `failOnUploadError` is set to `false` in this example.
+- `buildName` uses `GITHUB_WORKFLOW`.
+- CI metadata (`branch`, `commitSha`, `repositoryUrl`, `buildNumber`, `buildUrl`) is auto-resolved.
+- `use.screenshot = 'only-on-failure'` supports artifact-rich triage.
 
-## CI with GitHub Actions
+Reporter docs: <https://docs.testream.app/reporters/playwright>
 
-The workflow at `.github/workflows/playwright.yml` runs all tests on every push and pull request. The only secret you need to add is your Testream API key:
+## GitHub Actions setup
 
-**Settings → Secrets and variables → Actions → New repository secret**
+The workflow at `.github/workflows/playwright.yml` runs on push, pull request, and manual dispatch.
+
+Add this repository secret:
+
+**Settings -> Secrets and variables -> Actions -> New repository secret**
 
 | Name | Value |
 |---|---|
-| `TESTREAM_API_KEY` | your Testream API key |
+| `TESTREAM_API_KEY` | Your Testream API key |
 
-All other metadata (branch, commit SHA, build number, build URL, repository URL) is resolved automatically — nothing else to configure.
+Workflow env examples already set:
 
-## Viewing results in Jira
+| Variable | Example |
+|---|---|
+| `TEST_ENV` | `ci` |
+| `GITHUB_WORKFLOW` | Auto-injected by runner |
 
-Once tests are uploaded, open your Testream project and connect it to your Jira workspace. With the **[Testream for Jira](https://marketplace.atlassian.com/apps/3048460704/testream-for-jira)** app installed you get:
+## How results appear in Jira
 
-- **Dashboard** — pass rates, failure counts, flaky test detection, and execution summaries at a glance
-- **Failure Insights** — inspect failed tests with the full error, stack trace, screenshots, videos, and traces attached
-- **Trends & Analytics** — pass/fail trends, duration patterns, and suite growth over custom date ranges
-- **Test Suite Changes** — see which tests were added or removed between runs
-- **Release Visibility** — link test runs to Jira releases to track quality before shipping
-- **Jira Issues** — create issues directly from any failed test with failure context pre-filled
+After connecting Testream to Jira, you get:
 
-See the [Testream Playwright reporter docs](https://docs.testream.app/reporters/playwright) for the full list of configuration options.
+- Dashboard summaries for run health
+- Failure diagnostics with stack traces, screenshots, and traces
+- Trend analytics over time
+- Jira issue creation directly from failed tests
+
+## Troubleshooting
+
+### Upload not happening
+
+- Confirm `TESTREAM_API_KEY` is present.
+- Confirm `TESTREAM_UPLOAD_ENABLED` is not set to `false`.
+
+### Playwright runs but no Jira data appears
+
+- Verify Testream project connection to the correct Jira workspace.
+- Verify Testream Automated Test Management and Reporting for Jira app installation.
+
+### CI uploads missing
+
+- Confirm GitHub Actions secrets are available to the run context.
+
+## FAQ
+
+### Is this repository production-ready?
+
+It is an example template with production-style CI and reporter wiring intended to be adapted.
+
+### Why include failing tests?
+
+To demonstrate artifact capture (screenshots/traces) and Jira-based failure triage.
+
+### Can I run tests without Testream?
+
+Yes. Playwright runs normally without API key-based upload.
+
+## Playwright Jira reporting alternatives (quick view)
+
+| Approach | Benefit | Tradeoff |
+|---|---|---|
+| Local Playwright HTML only | Simple local debugging | No Jira-native historical analytics |
+| Custom upload scripts | Flexible | Higher maintenance overhead |
+| Testream Playwright reporter (this repo) | Native integration + artifact-aware Jira workflow | Requires Testream setup |
+
+## Related links
+
+- Testream app: <https://testream.app>
+- Testream Automated Test Management and Reporting for Jira: <https://marketplace.atlassian.com/apps/3048460704/testream-automated-test-management-and-reporting-for-jira>
+- Playwright reporter docs: <https://docs.testream.app/reporters/playwright>
+- Playwright docs: <https://playwright.dev>
